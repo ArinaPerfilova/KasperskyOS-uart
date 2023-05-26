@@ -1,40 +1,57 @@
 #include <coresrv/syscalls.h>
-
 #include <stdint.h>
-
 #include <stdio.h>
-
 #include <stdlib.h>
-
 #include <rtl/countof.h>
-
 #include <uart/uart.h>
 
- 
+#include <unistd.h>
+#include <gpio/gpio.h>
+#include <stdbool.h>
+#include <sys/cdefs.h>
+#include <bsp/bsp.h>
 
 #define UART1_RX_PIN (13)
 
-#define UART2_TX_PIN (14)
+#define UART2_TX_PIN (12)
 
- 
-
- 
-
-#define UART3_RX_PIN (15)
+#define UART3_RX_PIN (11)
 
 #define UART4_TX_PIN (16)
-
- 
-
- 
 
 #define UART5_RX_PIN (17)
 
 #define UART6_TX_PIN (18)
 
+
+#define GPIO_PIN_NUM   RTL_UINT32_C(28)
+#define DELAY_S        2
+#define HW_MODULE_NAME "gpio0"
+#define HW_MODULE_CFG  "raspberry_pi4b.default"
+
+#define GPIO_PIN_UART_TX 14
+#define GPIO_PIN_UART_RX 15
  
 
- 
+ static const rtl_uint32_t ExceptionPinArr[] = { GPIO_PIN_UART_TX,
+                                                GPIO_PIN_UART_RX };
+
+static bool IsExceptionPin(const rtl_uint32_t pin)
+{
+    bool isExceptionPin = false;
+
+    for (size_t i = 0; i < rtl_countof(ExceptionPinArr); i++)
+    {
+        if (ExceptionPinArr[i] == pin)
+        {
+            isExceptionPin = true;
+            break;
+        }
+    }
+
+    return isExceptionPin;
+}
+
 
 char str2[] = "Open duplicate element\n"; // строка которую будем выводить в порт
 
@@ -51,6 +68,11 @@ char str5[] = "Сlose duplicate element\n";
 int main(void)
 
 {
+
+int returnValue = EXIT_FAILURE;
+    Retcode rc = rcFail;
+    GpioHandle handle = GPIO_INVALID_HANDLE;
+
 
 static const char str[] = "Turn on the alarm!\n"; // строка которую будем выводить в порт
 
@@ -100,19 +122,25 @@ rtl_size_t i; // (записываем в переменную i значени�
 
  
 
-for (i = 0; i < rtl_countof(str4) - 1; ++i) // посылаем в порт сообщение из str4
+for (i = 0; i < rtl_countof(str4) - 1; ++i) {// посылаем в порт сообщение из str4
 
-UartWriteByte(uartH, (uint8_t)str4[i]);
-
+	UartWriteByte(uartH, (uint8_t)str4[i]);
+}
 printf("The message from str has been sent to the port\n", PORT_NAME); // выводит в интерфейс
 
  
 
 return EXIT_SUCCESS;
 
- 
-
-if (rc == '1') // если пришла 1
+ P_A [] = { Pd1, Pd2, Pd3} 
+ do 
+{	 
+	for (sensor_triggering = 0; sensor_triggering < 3; ++i ) { 
+ 			
+ 	pinNum = P_A(sensor_triggering);
+ 	rc = GpioIn(handle, pinNum, &pinVal); 
+ 	
+if ( pinVal == '1') // если сработал датчик  
 
 {
 
@@ -166,15 +194,10 @@ printf("The message from str2 has been sent to the port\n", UART2_TX_PIN); // в
 
 return EXIT_SUCCESS;
 
- 
-
- 
-
 }
 
- 
 
-if (rc == '2') // если пришла 2
+if (pinVal == '2') // если пришла 2
 
 {
 
@@ -196,11 +219,8 @@ UartWriteByte(uartH, (uint8_t)str[i]);
 
 printf("The message from str has been sent to the port\n", UART3_RX_PIN ); // выводит в интерфейс
 
- 
-
 return EXIT_SUCCESS;
 
- 
 
 rc = UartOpenPort(UART3_RX_PIN, &uartH); // открываем порт UART3_RX_PIN
 
@@ -212,29 +232,23 @@ UartWriteByte(uartH, (uint8_t)str3[i]);
 
 printf("The message from str has been sent to the port\n", UART3_RX_PIN); // выводит в интерфейс
 
- 
 
- 
 
 return EXIT_SUCCESS;
 
 rc = UartOpenPort(UART4_TX_PIN, &uartH); // открываем порт UART4_TX_PIN дублирующий
 
  
-
 for (i = 0; i < rtl_countof(str2) - 1; ++i) // посылаем в порт сообщение из str2
 
 UartWriteByte(uartH, (uint8_t)str2[i]);
 
 printf("The message from str2 has been sent to the port\n", UART4_TX_PIN); // выводит в интерфейс
 
- 
-
 }
 
- 
 
-if (rc == '3') // если пришла 3
+if (pinVal == '3') // если пришла 3
 
 {
 
@@ -268,7 +282,7 @@ printf("The message from str has been sent to the port\n", UART5_RX_PIN); // в�
 
 }
 
-if (rc == '4') // если пришла 4
+if (pinVal == '4') // если пришла 4
 
 {
 
@@ -294,7 +308,7 @@ return EXIT_SUCCESS;
 
 }
 
-if (rc == '5') // если пришла 5
+if (pinVal == '5') // если пришла 5
 
 {
 
@@ -320,7 +334,7 @@ return EXIT_SUCCESS;
 
 }
 
-if (rc == '6') // если пришла 6
+if (pinVal == '6') // если пришла 6
 
 {
 
@@ -342,12 +356,10 @@ printf("The message from str has been sent to the port\n", UART5_RX_PIN ); // в
 
 return EXIT_SUCCESS;
 
- 
 
 }
 
- 
-
- 
-
+ break; 
+} 
+} while (1);
 }
